@@ -27,7 +27,7 @@ release
   .option('-M, --major', 'major release X.#.# for breaking changes')
   .option('-m, --minor', 'minor release #.X.# non-breaking for feature additions')
   .option('-p, --patch', 'patch release #.#.X for patch fixes/tweaks')
-  .option('-s, --src <dir>', 'directory to build/release from (default=src)')
+  .option('-s, --src <dir>', 'directory to build/release from (default=root)')
   .option('-d, --dest <dir>', 'temporary build directory (default=.dist)')
   .option('-t, --test', 'build, but do not publish')
   .option('-c, --nocleanup', 'leave build folder after publishing')
@@ -41,8 +41,9 @@ let releaseType =
   undefined
 
 let { src, dest, verbose, test, nocleanup } = release
-let targetFolder = src || 'src'
+let targetFolder = src || ''
 let releaseFolder = dest || '.dist'
+let releasingFromRoot = targetFolder === ''
 
 // return --help if no release style specified
 if (!releaseType) return release.outputHelp()
@@ -60,37 +61,41 @@ if (verbose) {
 async function runRelease() {
   console.log(chalk.white.bold('\nreleasing to NPM via yarn...'))
   // empty any previous distribution
-  console.log(chalk.gray(`emptying ${releaseFolder}...`))
-  await fs.emptyDir(distFolder).catch(logError)
 
-  // ensure release directory exists
-  console.log(chalk.gray(`ensuring ${releaseFolder} exists...`))
-  !hasErrors() && await fs.ensureDir(distFolder).catch(logError)
+  if (!releasingFromRoot) {
+    console.log(chalk.gray(`emptying ${releaseFolder}...`))
+    await fs.emptyDir(distFolder).catch(logError)
 
-  // copy client to dist folder
-  console.log(chalk.gray(`copying ${targetFolder} to ${releaseFolder}...`))
-  const filter = (src) => !src.includes('/node_modules')
-  !hasErrors() && await fs.copy(sourceFolder, distFolder, { filter }).catch(logError)
+    // ensure release directory exists
+    console.log(chalk.gray(`ensuring ${releaseFolder} exists...`))
+    !hasErrors() && await fs.ensureDir(distFolder).catch(logError)
 
-  // copy .npmrc to dist folder
-  console.log(chalk.gray(`copying .npmrc (if exists)...`))
-  !hasErrors() && await fs.copy(`${rootFolder}/.npmrc`, `${distFolder}/.npmrc`).catch(ignore)
+    // copy client to dist folder
+    console.log(chalk.gray(`copying ${targetFolder} to ${releaseFolder}...`))
+    const filter = (src) => !src.includes('/node_modules')
+    !hasErrors() && await fs.copy(sourceFolder, distFolder, { filter }).catch(logError)
 
-  // clean up package.json before writing
-  console.log(chalk.gray(`cleaning package.json...`))
-  delete distPkg.devDependencies
-  delete distPkg.scripts
+    // copy .npmrc to dist folder
+    console.log(chalk.gray(`copying .npmrc (if exists)...`))
+    !hasErrors() && await fs.copy(`${rootFolder}/.npmrc`, `${distFolder}/.npmrc`).catch(ignore)
 
-  // write modified package.json
-  console.log(chalk.gray(`writing package.json...`))
-  verbose && explain(`target=${distFolder}/package.json`)
-  await fs.writeJson(`${distFolder}/package.json`, distPkg, { spaces: 2 })
-          .then(() => console.log(chalk.gray(`created ${distFolder}/package.json`)))
-          .catch(console.log)
+    // clean up package.json before writing
+    console.log(chalk.gray(`cleaning package.json...`))
+    delete distPkg.devDependencies
+    delete distPkg.scripts
 
-  // update version and publish
-  verbose && explain(`cd ${releaseFolder}`)
-  process.chdir(releaseFolder)
+    // write modified package.json
+    console.log(chalk.gray(`writing package.json...`))
+    verbose && explain(`target=${distFolder}/package.json`)
+    await fs.writeJson(`${distFolder}/package.json`, distPkg, { spaces: 2 })
+            .then(() => console.log(chalk.gray(`created ${distFolder}/package.json`)))
+            .catch(console.log)
+
+    // update version and publish
+    verbose && explain(`cd ${releaseFolder}`)
+    process.chdir(releaseFolder)
+  }
+
   console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(distPkg.version)})...`))
   await cmdAsync(`npm version ${releaseType}`)
   const { version, name } = require(`${distFolder}/package.json`)

@@ -1,20 +1,20 @@
-A rapid scaffolding generator that leaves your core dependencies upgradeable.
+Simplifies module releases to NPM via Yarn
+===
 
-# Requirements
-- [Node (current, v10+)](https://nodejs.org/en/download/current/)
-- [Yarn](https://yarnpkg.com/lang/en/docs/install/#mac-stable)
+# Why?
+When you want to publish to NPM, but NOT from the root (e.g. from a build folder),
+this basically simplifies the following steps into a single one:
+- copying the root package.json into the build folder
+- cleaning it up to remove dev deps
+- navigating into that folder
+- incrementing the appropriate version number
+- publishing
+- making sure that version number makes it back down to the root project to keep it all in sync
+- navigating back out to the root
 
-# Get Started
-```bash
-mkdir myproject                  # create a directory for your project
-cd myproject                     # enter new project directory
-npm init                         # initialize project
-git init                         # connect directory to git
-yarn add -D @arundo/spa-builder  # add spa-builder as a devDependency
-yarn generate                    # run the spa-builder
-yarn dev                         # start the dev server
-
-# code stuff and hit save!
+# Installation
+```
+yarn add -D @supergeneric/yarn-release
 ```
 
 # Exposed Commands
@@ -28,8 +28,25 @@ yarn dev                         # start the dev server
 -p, --patch       patch release #.#.X for patch fixes/tweaks
 -s, --src <dir>   directory to build/release from (default=./src)
 -d, --dest <dir>  temporary build directory (default=./.dist)
--t, --test        build, but do not publish
--c, --nocleanup   leave build folder after publishing
+-t, --test        build, but do not publish (great for testing locally)
+-c, --nocleanup   leave build folder after publishing (great for testing locally)
 -v, --verbose     writes a bunch of extra stuff to the console
 -h, --help        output usage information
 ```
+
+### Example Usage (package.json)
+```js
+{
+  "scripts": {
+    "build": "do some stuff",
+    "release:major": "yarn build && release --major --src=build",
+    "release:minor": "yarn build && release --minor --src=build",
+    "release:patch": "yarn build && release --patch --src=build",
+  }
+}
+```
+
+### Caveats
+- This build will do a generic `yarn publish` without specific `--access=public` flag,
+meaning it will default to private if it's never been published.  Solution is to publish once with that
+flag set, then use `release` to maintain.
