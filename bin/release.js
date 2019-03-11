@@ -22,9 +22,10 @@ release
   .option('-m, --minor', 'minor release #.X.# non-breaking for feature additions')
   .option('-p, --patch', 'patch release #.#.X for patch fixes/tweaks')
   .option('-s, --src <dir>', 'directory to build/release from (default=./src)')
-  .option('-t, --temp <dir>', 'temporary build directory (default=./.dist)')
-  .option('-d, --dry', 'build, but do not publish')
+  .option('-d, --dest <dir>', 'temporary build directory (default=./.dist)')
+  .option('-t, --test', 'build, but do not publish')
   .option('-c, --nocleanup', 'leave build folder after publishing')
+  .option('-v, --verbose', 'writes a bunch of extra stuff to the console')
   .parse(process.argv)
 
 let releaseType =
@@ -34,7 +35,7 @@ let releaseType =
   undefined
 
 let targetFolder = release.src || 'src/client'
-let releaseFolder = release.temp || '.dist'
+let releaseFolder = release.dest || '.dist'
 
 // return --help if no release style specified
 if (!releaseType) return release.outputHelp()
@@ -47,18 +48,24 @@ async function runRelease() {
   console.log(chalk.white.bold('\nreleasing to NPM via yarn...'))
   // empty any previous distribution
   console.log(chalk.gray(`emptying ${releaseFolder}...`))
+  release.verbose && console.log(chalk.magenta(`target=${distFolder}`))
   await fs.emptyDir(distFolder).catch(logError)
 
   // ensure release directory exists
   console.log(chalk.gray(`ensuring ${releaseFolder} exists...`))
+  release.verbose && console.log(chalk.magenta(`target=${distFolder}`))
   await fs.ensureDir(distFolder)
 
   // copy client to dist folder
   console.log(chalk.gray(`copying ${targetFolder} to ${releaseFolder}...`))
+  release.verbose && console.log(chalk.magenta(`source=${sourceFolder}`))
+  release.verbose && console.log(chalk.magenta(`target=${distFolder}`))
   !hasErrors() && await fs.copy(sourceFolder, distFolder).catch(logError)
 
   // copy .npmrc to dist folder
   console.log(chalk.gray(`copying .npmrc...`))
+  release.verbose && console.log(chalk.magenta(`root=${rootFolder}/.npmrc`))
+  release.verbose && console.log(chalk.magenta(`target=${distFolder}/.npmrc`))
   !hasErrors() && await fs.copy(`${rootFolder}/.npmrc`, `${distFolder}/.npmrc`).catch(logError)
 
   // clean up package.json before writing
@@ -68,6 +75,7 @@ async function runRelease() {
 
   // write modified package.json
   console.log(chalk.gray(`writing package.json...`))
+  release.verbose && console.log(chalk.magenta(`target=${distFolder}/package.json`))
   await fs.writeJson(`${distFolder}/package.json`, distPkg, { spaces: 2 })
           .then(() => console.log(chalk.gray(`created ${distFolder}/package.json`)))
           .catch(console.log)
@@ -79,11 +87,12 @@ async function runRelease() {
   const { version, name } = require(`${distFolder}/package.json`)
   console.log(chalk.green(`publishing ${name} --> v${version}`))
 
-  if (release.dry) {
-    console.log(chalk.yellow(`dry-run complete... skipping publish`))
+  if (release.test) {
+    console.log(chalk.yellow(`test complete... skipping publish`))
   } else {
     // publish
-    await cmdAsync(`yarn publish --new-version ${version}`).catch(logError)
+    let output = await cmdAsync(`yarn publish --new-version ${version}`).catch(logError)
+    release.verbose && console.log(chalk.magenta(output))
   }
 
   release.nocleanup !== true && await fs.remove(distFolder)
@@ -95,7 +104,7 @@ async function runRelease() {
     // write new version back to root package.json
     pkg.version = version
 
-    !release.dry && await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
+    !release.test && await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
                             .catch(console.log)
 
     console.log(chalk.green('\nSuccess!'))

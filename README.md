@@ -27,8 +27,9 @@ yarn dev                         # start the dev server
 -m, --minor       minor release #.X.# non-breaking for feature additions
 -p, --patch       patch release #.#.X for patch fixes/tweaks
 -s, --src <dir>   directory to build/release from (default=./src)
--t, --temp <dir>  temporary build directory (default=./.dist)
--d, --dry         build, but do not publish
+-d, --dest <dir>  temporary build directory (default=./.dist)
+-t, --test        build, but do not publish
 -c, --nocleanup   leave build folder after publishing
+-v, --verbose     writes a bunch of extra stuff to the console
 -h, --help        output usage information
 ```
