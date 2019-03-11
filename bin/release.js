@@ -99,8 +99,8 @@ async function runRelease() {
   console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(distPkg.version)})...`))
   await cmdAsync(`npm version ${releaseType}`)
   const { version, name } = releasingFromRoot
-    ? require(`${distFolder}/package.json`)
-    : require(`${rootFolder}/package.json`)
+    ? require(`${rootFolder}/package.json`)
+    : require(`${distFolder}/package.json`)
   console.log(chalk.green(`publishing ${name} --> v${version}`))
 
   if (test) {
