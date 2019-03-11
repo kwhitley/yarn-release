@@ -129,7 +129,7 @@ async function runRelease() {
             .then(() => console.log(chalk.gray(`created ${distFolder}/package.json`)))
             .catch(console.log)
 
-    let output = await cmdAsync(`yarn publish --new-version ${version}` + (public ? ' --access=public' : '')).catch(logError)
+    let output = await cmdAsync(`yarn publish --new-version ${newVersion}` + (public ? ' --access=public' : '')).catch(logError)
     verbose && explain(output)
   }
 
