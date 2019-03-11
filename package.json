@@ -7,9 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "verify": "node bin/release.js --patch --src=bin --nocleanup --test --verbose",
     "verify:root": "node bin/release.js --patch --nocleanup --test --verbose",
-    "release:major": "node bin/release.js --major --test",
-    "release:minor": "node bin/release.js --minor --test",
-    "release:patch": "node bin/release.js --patch --test"
+    "release:major": "node bin/release.js --major",
+    "release:minor": "node bin/release.js --minor",
+    "release:patch": "node bin/release.js --patch"
   },
   "bin": {
     "release": "./bin/release.js"
