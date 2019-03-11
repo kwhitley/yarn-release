@@ -27,8 +27,8 @@ release
   .option('-M, --major', 'major release X.#.# for breaking changes')
   .option('-m, --minor', 'minor release #.X.# non-breaking for feature additions')
   .option('-p, --patch', 'patch release #.#.X for patch fixes/tweaks')
-  .option('-s, --src <dir>', 'directory to build/release from (default=./src)')
-  .option('-d, --dest <dir>', 'temporary build directory (default=./.dist)')
+  .option('-s, --src <dir>', 'directory to build/release from (default=src)')
+  .option('-d, --dest <dir>', 'temporary build directory (default=.dist)')
   .option('-t, --test', 'build, but do not publish')
   .option('-c, --nocleanup', 'leave build folder after publishing')
   .option('-v, --verbose', 'writes a bunch of extra stuff to the console')
@@ -41,7 +41,7 @@ let releaseType =
   undefined
 
 let { src, dest, verbose, test, nocleanup } = release
-let targetFolder = src || 'src/client'
+let targetFolder = src || 'src'
 let releaseFolder = dest || '.dist'
 
 // return --help if no release style specified
@@ -69,7 +69,8 @@ async function runRelease() {
 
   // copy client to dist folder
   console.log(chalk.gray(`copying ${targetFolder} to ${releaseFolder}...`))
-  !hasErrors() && await fs.copy(sourceFolder, distFolder).catch(logError)
+  const filter = (src) => !src.includes('/node_modules')
+  !hasErrors() && await fs.copy(sourceFolder, distFolder, { filter }).catch(logError)
 
   // copy .npmrc to dist folder
   console.log(chalk.gray(`copying .npmrc (if exists)...`))
