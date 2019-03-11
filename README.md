@@ -2,8 +2,7 @@ Simplifies module releases to NPM via Yarn
 ===
 
 # Why?
-When you want to publish to NPM, but NOT from the root (e.g. from a build folder),
-this basically simplifies the following steps into a single one:
+For simplifying the steps when publishing to NPM (especially if from a subfolder):
 - copying the root package.json into the build folder
 - cleaning it up to remove dev deps
 - navigating into that folder
