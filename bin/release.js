@@ -96,7 +96,7 @@ async function runRelease() {
     process.chdir(releaseFolder)
   }
 
-  console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(distPkg.version)})...`))
+  console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(pkg.version)})...`))
   await cmdAsync(`npm version ${releaseType}`)
   const { version, name } = releasingFromRoot
     ? require(`${rootFolder}/package.json`)
