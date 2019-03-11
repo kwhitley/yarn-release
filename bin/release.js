@@ -73,7 +73,7 @@ async function runRelease() {
           .catch(console.log)
 
   // update version and publish
-  process.chdir('./' + releaseFolder)
+  process.chdir(releaseFolder)
   console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(distPkg.version)})...`))
   await cmdAsync(`npm version ${releaseType}`)
   const { version, name } = require(`${distFolder}/package.json`)

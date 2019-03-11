@@ -1,14 +1,8 @@
 A rapid scaffolding generator that leaves your core dependencies upgradeable.
-#### Arundo Approved.
 
 # Requirements
 - [Node (current, v10+)](https://nodejs.org/en/download/current/)
 - [Yarn](https://yarnpkg.com/lang/en/docs/install/#mac-stable)
-- need NPM_TOKEN environment set to allow @arundo deps
-
-```
-export NPM_TOKEN=0eedeefa-1bac-4452-9b5e-f8e946cabec3
-```
 
 # Get Started
 ```bash
@@ -24,7 +18,7 @@ yarn dev                         # start the dev server
 ```
 
 # Exposed Commands
-- Just one: `yarn release`
+- Just one: `yarn release --major|minor|patch [options]`
 
 ### Options
 ```bash
