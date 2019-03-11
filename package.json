@@ -1,7 +1,15 @@
 {
   "name": "@supergeneric/yarn-release",
-  "version": "1.0.31",
+  "version": "1.0.32",
   "description": "Simplifies module releases to NPM via Yarn",
+  "keywords": [
+    "publish",
+    "yarn",
+    "npm",
+    "libraries",
+    "modules",
+    "easy"
+  ],
   "main": "bin/release.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
