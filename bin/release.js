@@ -100,11 +100,14 @@ async function runRelease() {
     console.log(chalk.gray(`copying .npmrc (if exists)...`))
     !hasErrors() && await fs.copy(`${rootFolder}/.npmrc`, `${distFolder}/.npmrc`).catch(ignore)
 
+    // copy .npmrc to dist folder
+    console.log(chalk.gray(`copying README.md (if exists)...`))
+    !hasErrors() && await fs.copy(`${rootFolder}/README.md`, `${distFolder}/README.md`).catch(ignore)
+
     // update version and publish
     verbose && explain(`cd ${releaseFolder}`)
     process.chdir(releaseFolder)
   }
-
 
   if (test) {
     console.log(chalk.white(`publishing ${name} --> v${newVersion}`))
