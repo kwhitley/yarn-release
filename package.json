@@ -9,7 +9,7 @@
     "verify:root": "node bin/release.js --patch --nocleanup --test --verbose",
     "release:major": "node bin/release.js --major",
     "release:minor": "node bin/release.js --minor",
-    "release:patch": "node bin/release.js --patch"
+    "release:patch": "node bin/release.js --patch --test"
   },
   "bin": {
     "release": "./bin/release.js"
