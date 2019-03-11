@@ -1,0 +1,32 @@
+{
+  "name": "@supergeneric/yarn-release",
+  "version": "1.0.0",
+  "description": "Simplifies module releases to NPM via Yarn",
+  "main": "bin/release.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "verify": "node bin/release.js --patch --src bin --nocleanup --dry"
+  },
+  "bin": {
+    "release": "./bin/release.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kwhitley/yarn-release.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kwhitley/yarn-release/issues"
+  },
+  "homepage": "https://github.com/kwhitley/yarn-release#readme",
+  "dependencies": {
+    "bluebird": "^3.5.3",
+    "chalk": "^2.4.2",
+    "commander": "^2.19.0",
+    "fs-extra": "^7.0.1",
+    "node-cmd": "^3.0.0",
+    "np": "^4.0.2",
+    "rimraf": "^2.6.3"
+  }
+}
