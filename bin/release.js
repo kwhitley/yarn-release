@@ -4,7 +4,6 @@ const release = require('commander')
 const pkg = require('../package.json')
 const cmd = require('node-cmd')
 const chalk = require('chalk')
-const rimraf = require('rimraf')
 const fs = require('fs-extra')
 const Promise = require('bluebird')
 const path = require('path')
@@ -15,6 +14,7 @@ const distPkg = JSON.parse(JSON.stringify(pkg))
 const errors = []
 
 const logError = (err) => err && errors.push(err)
+const ignore = () => {}
 const hasErrors = () => errors.length > 0
 const explain = (...args) => {
   let style = chalk.magenta
@@ -72,10 +72,8 @@ async function runRelease() {
   !hasErrors() && await fs.copy(sourceFolder, distFolder).catch(logError)
 
   // copy .npmrc to dist folder
-  console.log(chalk.gray(`copying .npmrc...`))
-  verbose && explain(`root=${rootFolder}/.npmrc`)
-  verbose && explain(`target=${distFolder}/.npmrc`)
-  !hasErrors() && await fs.copy(`${rootFolder}/.npmrc`, `${distFolder}/.npmrc`).catch(logError)
+  console.log(chalk.gray(`copying .npmrc (if exists)...`))
+  !hasErrors() && await fs.copy(`${rootFolder}/.npmrc`, `${distFolder}/.npmrc`).catch(ignore)
 
   // clean up package.json before writing
   console.log(chalk.gray(`cleaning package.json...`))
