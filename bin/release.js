@@ -14,7 +14,7 @@ const cmdAsync = Promise.promisify(cmd.get, { multiArgs: true, context: cmd })
 const distPkg = JSON.parse(JSON.stringify(pkg))
 const errors = []
 
-const logError = (err) => err && errors.push(err.message)
+const logError = (err) => err && errors.push(err)
 const hasErrors = () => errors.length > 0
 const explain = (...args) => {
   let style = chalk.magenta
@@ -41,16 +41,15 @@ let releaseType =
   undefined
 
 let { src, dest, verbose, test, nocleanup } = release
-let targetFolder = release.src || 'src/client'
-let releaseFolder = release.dest || '.dist'
+let targetFolder = src || 'src/client'
+let releaseFolder = dest || '.dist'
 
 // return --help if no release style specified
 if (!releaseType) return release.outputHelp()
 
-const rootFolder = path.join(rootPath, '..')
-const sourceFolder = path.join(rootPath, '../' + targetFolder)
-const distFolder = path.join(rootPath, '../', releaseFolder)
-
+const rootFolder = path.join(rootPath)
+const sourceFolder = path.join(rootPath, targetFolder)
+const distFolder = path.join(rootPath, releaseFolder)
 
 if (verbose) {
   explain('root', rootFolder)
@@ -66,7 +65,7 @@ async function runRelease() {
 
   // ensure release directory exists
   console.log(chalk.gray(`ensuring ${releaseFolder} exists...`))
-  await fs.ensureDir(distFolder)
+  !hasErrors() && await fs.ensureDir(distFolder).catch(logError)
 
   // copy client to dist folder
   console.log(chalk.gray(`copying ${targetFolder} to ${releaseFolder}...`))
@@ -74,8 +73,8 @@ async function runRelease() {
 
   // copy .npmrc to dist folder
   console.log(chalk.gray(`copying .npmrc...`))
-  release.verbose && explain(`root=${rootFolder}/.npmrc`)
-  release.verbose && explain(`target=${distFolder}/.npmrc`)
+  verbose && explain(`root=${rootFolder}/.npmrc`)
+  verbose && explain(`target=${distFolder}/.npmrc`)
   !hasErrors() && await fs.copy(`${rootFolder}/.npmrc`, `${distFolder}/.npmrc`).catch(logError)
 
   // clean up package.json before writing
@@ -85,27 +84,28 @@ async function runRelease() {
 
   // write modified package.json
   console.log(chalk.gray(`writing package.json...`))
-  release.verbose && explain(`target=${distFolder}/package.json`)
+  verbose && explain(`target=${distFolder}/package.json`)
   await fs.writeJson(`${distFolder}/package.json`, distPkg, { spaces: 2 })
           .then(() => console.log(chalk.gray(`created ${distFolder}/package.json`)))
           .catch(console.log)
 
   // update version and publish
+  verbose && explain(`cd ${releaseFolder}`)
   process.chdir(releaseFolder)
   console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(distPkg.version)})...`))
   await cmdAsync(`npm version ${releaseType}`)
   const { version, name } = require(`${distFolder}/package.json`)
   console.log(chalk.green(`publishing ${name} --> v${version}`))
 
-  if (release.test) {
+  if (test) {
     console.log(chalk.yellow(`test complete... skipping publish`))
   } else {
     // publish
     let output = await cmdAsync(`yarn publish --new-version ${version}`).catch(logError)
-    release.verbose && explain(output)
+    verbose && explain(output)
   }
 
-  release.nocleanup !== true && await fs.remove(distFolder)
+  nocleanup !== true && await fs.remove(distFolder)
 
   if (hasErrors()) {
     console.log(chalk.yellow(`\n${errors.length} errors...`))
@@ -114,7 +114,7 @@ async function runRelease() {
     // write new version back to root package.json
     pkg.version = version
 
-    !release.test && await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
+    !test && await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
                             .catch(console.log)
 
     console.log(chalk.green('\nSuccess!'))
