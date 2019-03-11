@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 const release = require('commander')
-const pkg = require('../package.json')
 const cmd = require('node-cmd')
 const chalk = require('chalk')
 const fs = require('fs-extra')
 const Promise = require('bluebird')
 const path = require('path')
 const rootPath = require('app-root-path').toString()
+const pkg = require(`${rootPath}/package.json`)
 
 const cmdAsync = Promise.promisify(cmd.get, { multiArgs: true, context: cmd })
 const distPkg = JSON.parse(JSON.stringify(pkg))
