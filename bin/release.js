@@ -8,6 +8,7 @@ const rimraf = require('rimraf')
 const fs = require('fs-extra')
 const Promise = require('bluebird')
 const path = require('path')
+const rootPath = require('app-root-path').toString()
 
 const cmdAsync = Promise.promisify(cmd.get, { multiArgs: true, context: cmd })
 const distPkg = JSON.parse(JSON.stringify(pkg))
@@ -15,6 +16,11 @@ const errors = []
 
 const logError = (err) => err && errors.push(err.message)
 const hasErrors = () => errors.length > 0
+const explain = (...args) => {
+  let style = chalk.magenta
+  args = args.map((a, i) => args.length > 1 && i === 0 ? style.bold(`[${a}]`) : style(a))
+  console.log(...args)
+}
 
 release
   .version(pkg.version)
@@ -34,38 +40,42 @@ let releaseType =
   (release.patch && 'patch') ||
   undefined
 
+let { src, dest, verbose, test, nocleanup } = release
 let targetFolder = release.src || 'src/client'
 let releaseFolder = release.dest || '.dist'
 
 // return --help if no release style specified
 if (!releaseType) return release.outputHelp()
 
-const rootFolder = path.join(__dirname, '..')
-const sourceFolder = path.join(__dirname, '../' + targetFolder)
-const distFolder = path.join(__dirname, '../', releaseFolder)
+const rootFolder = path.join(rootPath, '..')
+const sourceFolder = path.join(rootPath, '../' + targetFolder)
+const distFolder = path.join(rootPath, '../', releaseFolder)
+
+
+if (verbose) {
+  explain('root', rootFolder)
+  explain('src', sourceFolder)
+  explain('dest', distFolder)
+}
 
 async function runRelease() {
   console.log(chalk.white.bold('\nreleasing to NPM via yarn...'))
   // empty any previous distribution
   console.log(chalk.gray(`emptying ${releaseFolder}...`))
-  release.verbose && console.log(chalk.magenta(`target=${distFolder}`))
   await fs.emptyDir(distFolder).catch(logError)
 
   // ensure release directory exists
   console.log(chalk.gray(`ensuring ${releaseFolder} exists...`))
-  release.verbose && console.log(chalk.magenta(`target=${distFolder}`))
   await fs.ensureDir(distFolder)
 
   // copy client to dist folder
   console.log(chalk.gray(`copying ${targetFolder} to ${releaseFolder}...`))
-  release.verbose && console.log(chalk.magenta(`source=${sourceFolder}`))
-  release.verbose && console.log(chalk.magenta(`target=${distFolder}`))
   !hasErrors() && await fs.copy(sourceFolder, distFolder).catch(logError)
 
   // copy .npmrc to dist folder
   console.log(chalk.gray(`copying .npmrc...`))
-  release.verbose && console.log(chalk.magenta(`root=${rootFolder}/.npmrc`))
-  release.verbose && console.log(chalk.magenta(`target=${distFolder}/.npmrc`))
+  release.verbose && explain(`root=${rootFolder}/.npmrc`)
+  release.verbose && explain(`target=${distFolder}/.npmrc`)
   !hasErrors() && await fs.copy(`${rootFolder}/.npmrc`, `${distFolder}/.npmrc`).catch(logError)
 
   // clean up package.json before writing
@@ -75,7 +85,7 @@ async function runRelease() {
 
   // write modified package.json
   console.log(chalk.gray(`writing package.json...`))
-  release.verbose && console.log(chalk.magenta(`target=${distFolder}/package.json`))
+  release.verbose && explain(`target=${distFolder}/package.json`)
   await fs.writeJson(`${distFolder}/package.json`, distPkg, { spaces: 2 })
           .then(() => console.log(chalk.gray(`created ${distFolder}/package.json`)))
           .catch(console.log)
@@ -92,7 +102,7 @@ async function runRelease() {
   } else {
     // publish
     let output = await cmdAsync(`yarn publish --new-version ${version}`).catch(logError)
-    release.verbose && console.log(chalk.magenta(output))
+    release.verbose && explain(output)
   }
 
   release.nocleanup !== true && await fs.remove(distFolder)
