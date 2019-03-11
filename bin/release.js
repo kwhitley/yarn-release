@@ -98,7 +98,9 @@ async function runRelease() {
 
   console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(distPkg.version)})...`))
   await cmdAsync(`npm version ${releaseType}`)
-  const { version, name } = require(`${distFolder}/package.json`)
+  const { version, name } = releasingFromRoot
+    ? require(`${distFolder}/package.json`)
+    : require(`${rootFolder}/package.json`)
   console.log(chalk.green(`publishing ${name} --> v${version}`))
 
   if (test) {
@@ -118,8 +120,8 @@ async function runRelease() {
     // write new version back to root package.json
     pkg.version = version
 
-    !test && await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
-                            .catch(console.log)
+    !test && !releasingFromRoot && await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
+                                            .catch(console.log)
 
     console.log(chalk.green('\nSuccess!'))
   }
