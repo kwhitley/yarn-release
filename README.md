@@ -32,6 +32,7 @@ yarn add -D @supergeneric/yarn-release
 -c, --nocleanup   leave build folder after publishing (great for testing locally)
 -v, --verbose     writes a bunch of extra stuff to the console
 -h, --help        output usage information
+--public          equivalent to npm publish --access=public
 ```
 
 ### Example Usage (package.json)

@@ -22,6 +22,20 @@ const explain = (...args) => {
   console.log(...args)
 }
 
+const versionBump = (v) => (type = 'patch') => {
+  let order = ['major', 'minor', 'patch']
+  let parts = v.split('.')
+  let base = Array(3).fill(0).map((v, i) => Number(parts[i] || v))
+  let target = order.indexOf(type)
+  let updated = base.map((v, i) => {
+    if (i < target) return v
+    if (i === target) return ++v
+    return 0
+  })
+
+  return updated.join('.')
+}
+
 release
   .version(pkg.version)
   .option('-M, --major', 'major release X.#.# for breaking changes')
@@ -32,6 +46,7 @@ release
   .option('-t, --test', 'build, but do not publish')
   .option('-c, --nocleanup', 'leave build folder after publishing')
   .option('-v, --verbose', 'writes a bunch of extra stuff to the console')
+  .option('--public', 'equivalent to npm publish --access=public')
   .parse(process.argv)
 
 let releaseType =
@@ -40,7 +55,7 @@ let releaseType =
   (release.patch && 'patch') ||
   undefined
 
-let { src, dest, verbose, test, nocleanup } = release
+let { src, dest, verbose, test, nocleanup, public } = release
 let targetFolder = src || ''
 let releaseFolder = dest || '.dist'
 let releasingFromRoot = targetFolder === ''
@@ -59,7 +74,13 @@ if (verbose) {
 }
 
 async function runRelease() {
+  let ver = pkg.version
+  let { name, version } = pkg
+  let newVersion = versionBump(version)(releaseType)
+  pkg.version = newVersion
+
   console.log(chalk.white.bold('\nreleasing to NPM via yarn...'))
+  console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(version)} to ${chalk.white(newVersion)}) ...`))
   // empty any previous distribution
 
   if (!releasingFromRoot) {
@@ -79,35 +100,36 @@ async function runRelease() {
     console.log(chalk.gray(`copying .npmrc (if exists)...`))
     !hasErrors() && await fs.copy(`${rootFolder}/.npmrc`, `${distFolder}/.npmrc`).catch(ignore)
 
-    // clean up package.json before writing
-    console.log(chalk.gray(`cleaning package.json...`))
-    delete distPkg.devDependencies
-    delete distPkg.scripts
-
-    // write modified package.json
-    console.log(chalk.gray(`writing package.json...`))
-    verbose && explain(`target=${distFolder}/package.json`)
-    await fs.writeJson(`${distFolder}/package.json`, distPkg, { spaces: 2 })
-            .then(() => console.log(chalk.gray(`created ${distFolder}/package.json`)))
-            .catch(console.log)
-
     // update version and publish
     verbose && explain(`cd ${releaseFolder}`)
     process.chdir(releaseFolder)
+
+    console.log(chalk.gray(`writing package.json to ${releaseFolder}...`))
+    verbose && explain(`target=${distFolder}/package.json`)
+    await fs.writeJson(`${distFolder}/package.json`, pkg, { spaces: 2 })
+            .then(() => console.log(chalk.gray(`created ${distFolder}/package.json`)))
+            .catch(console.log)
   }
 
-  console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(pkg.version)})...`))
-  await cmdAsync(`npm version ${releaseType}`)
-  const { version, name } = releasingFromRoot
-    ? require(`${rootFolder}/package.json`)
-    : require(`${distFolder}/package.json`)
-  console.log(chalk.green(`publishing ${name} --> v${version}`))
+  // console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(pkg.version)})...`))
+  // await cmdAsync(`npm version ${releaseType}`)
+  // const { version, name } = releasingFromRoot
+  //   ? require(`./package.json`)
+  //   : require(`${distFolder}/package.json`)
 
   if (test) {
+    console.log(chalk.green(`publishing ${name} --> v${newVersion}`))
     console.log(chalk.yellow(`test complete... skipping publish`))
   } else {
     // publish
-    let output = await cmdAsync(`yarn publish --new-version ${version}`).catch(logError)
+    // write modified package.json
+
+    console.log(chalk.gray('updating package.json'))
+    await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
+            .then(() => console.log(chalk.gray(`created ${distFolder}/package.json`)))
+            .catch(console.log)
+
+    let output = await cmdAsync(`yarn publish --new-version ${version}` + (public ? ' --access=public' : '')).catch(logError)
     verbose && explain(output)
   }
 
