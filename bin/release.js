@@ -79,7 +79,7 @@ async function runRelease() {
   let newVersion = versionBump(version)(releaseType)
   pkg.version = newVersion
 
-  console.log(chalk.white.bold('\nreleasing to NPM via yarn...'))
+  console.log(chalk.white.bold(`\nreleasing ${name} to NPM via yarn...`))
   console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(version)} to ${chalk.white(newVersion)}) ...`))
   // empty any previous distribution
 
@@ -103,32 +103,18 @@ async function runRelease() {
     // update version and publish
     verbose && explain(`cd ${releaseFolder}`)
     process.chdir(releaseFolder)
-
-    console.log(chalk.gray(`writing package.json to ${releaseFolder}...`))
-    verbose && explain(`target=${distFolder}/package.json`)
-    await fs.writeJson(`${distFolder}/package.json`, pkg, { spaces: 2 })
-            .then(() => console.log(chalk.gray(`created ${distFolder}/package.json`)))
-            .catch(console.log)
   }
 
-  // console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(pkg.version)})...`))
-  // await cmdAsync(`npm version ${releaseType}`)
-  // const { version, name } = releasingFromRoot
-  //   ? require(`./package.json`)
-  //   : require(`${distFolder}/package.json`)
 
   if (test) {
-    console.log(chalk.green(`publishing ${name} --> v${newVersion}`))
+    console.log(chalk.white(`publishing ${name} --> v${newVersion}`))
     console.log(chalk.yellow(`test complete... skipping publish`))
   } else {
-    // publish
-    // write modified package.json
-
-    console.log(chalk.gray('updating package.json'))
-    await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
-            .then(() => console.log(chalk.gray(`created ${distFolder}/package.json`)))
+    console.log(chalk.gray(`updating version in ${releasingFromRoot ? rootFolder : releaseFolder}/package.json`))
+    await fs.writeJson(`${releasingFromRoot ? rootFolder : distFolder}/package.json`, pkg, { spaces: 2 })
             .catch(console.log)
 
+    console.log(chalk.white(`publishing ${name} --> v${newVersion}`))
     let output = await cmdAsync(`yarn publish --new-version ${newVersion}` + (public ? ' --access=public' : '')).catch(logError)
     verbose && explain(output)
   }
@@ -140,12 +126,12 @@ async function runRelease() {
     console.log(...errors)
   } else {
     // write new version back to root package.json
-    pkg.version = version
 
     !test && !releasingFromRoot && await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
+                                            .then(console.log(chalk.gray('updated root package.json')))
                                             .catch(console.log)
 
-    console.log(chalk.green('\nSuccess!'))
+    console.log(chalk.green('Success!'))
   }
 }
 
