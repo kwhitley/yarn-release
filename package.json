@@ -1,6 +1,6 @@
 {
   "name": "@supergeneric/yarn-release",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Simplifies module releases to NPM via Yarn",
   "main": "bin/release.js",
   "scripts": {
