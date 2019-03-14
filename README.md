@@ -13,7 +13,7 @@ For simplifying the steps when publishing to NPM (especially if from a subfolder
 
 # Installation
 ```
-yarn add -D @supergeneric/yarn-release
+yarn add -D @kwhitley/yarn-release
 ```
 
 # Exposed Commands
