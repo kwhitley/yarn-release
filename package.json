@@ -1,6 +1,6 @@
 {
   "name": "@kwhitley/yarn-release",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Simplifies module releases to NPM via Yarn",
   "keywords": [
     "publish",
