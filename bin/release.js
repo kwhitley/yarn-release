@@ -135,6 +135,10 @@ async function runRelease() {
 
   nocleanup !== true && await fs.remove(distFolder)
 
+  !test && !releasingFromRoot && await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
+                                            .then(console.log(chalk.gray('updated root package.json')))
+                                            .catch(logError)
+
   if (commit || push) {
     process.chdir(rootFolder)
     console.log(chalk.gray(`commiting changes...`))
@@ -151,12 +155,6 @@ async function runRelease() {
     console.log(chalk.yellow(`\n${errors.length} errors...`))
     console.log(...errors)
   } else {
-    // write new version back to root package.json
-
-    !test && !releasingFromRoot && await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
-                                            .then(console.log(chalk.gray('updated root package.json')))
-                                            .catch(console.log)
-
     console.log(chalk.green('Success!'))
   }
 }
