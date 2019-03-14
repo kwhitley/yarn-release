@@ -25,7 +25,7 @@ yarn add -D @kwhitley/yarn-release
 -M, --major       major release X.#.# for breaking changes
 -m, --minor       minor release #.X.# non-breaking for feature additions
 -p, --patch       patch release #.#.X for patch fixes/tweaks
--s, --src <dir>   directory to build/release from (default=./src)
+-s, --src <dir>   directory to build/release from (default=root)
 -d, --dest <dir>  temporary build directory (default=./.dist)
 -t, --test        build, but do not publish (great for testing locally)
 -c, --nocleanup   leave build folder after publishing (great for testing locally)
