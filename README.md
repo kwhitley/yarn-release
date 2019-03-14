@@ -32,6 +32,8 @@ yarn add -D @kwhitley/yarn-release
 -v, --verbose     writes a bunch of extra stuff to the console
 -h, --help        output usage information
 --public          equivalent to npm publish --access=public
+--commit          adds unstaged changes (including package.json update) to git and commits
+--push            includes --commit, while also doing a "git push" (assumes ref has been set up)
 ```
 
 ### Example Usage (package.json)

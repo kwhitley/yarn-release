@@ -1,6 +1,6 @@
 {
   "name": "@kwhitley/yarn-release",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "Simplifies module releases to NPM via Yarn",
   "keywords": [
     "publish",
@@ -15,9 +15,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "verify": "node bin/release.js --patch --src=bin --nocleanup --test --verbose",
     "verify:root": "node bin/release.js --patch --nocleanup --test --verbose",
-    "release:major": "node bin/release.js --major",
-    "release:minor": "node bin/release.js --minor",
-    "release:patch": "node bin/release.js --patch"
+    "release:major": "node bin/release.js --major --push",
+    "release:minor": "node bin/release.js --minor --push",
+    "release:patch": "node bin/release.js --patch --push"
   },
   "bin": {
     "release": "./bin/release.js"

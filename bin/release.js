@@ -47,6 +47,8 @@ release
   .option('-c, --nocleanup', 'leave build folder after publishing')
   .option('-v, --verbose', 'writes a bunch of extra stuff to the console')
   .option('--public', 'equivalent to npm publish --access=public')
+  .option('--commit', 'adds unstaged changes (including package.json update) to git and commits')
+  .option('--push', 'includes --commit, while also doing a "git push" (assumes ref has been set up)')
   .parse(process.argv)
 
 let releaseType =
@@ -55,7 +57,16 @@ let releaseType =
   (release.patch && 'patch') ||
   undefined
 
-let { src, dest, verbose, test, nocleanup, public } = release
+let {
+  src,
+  dest,
+  verbose,
+  test,
+  nocleanup,
+  public,
+  commit,
+  push,
+} = release
 let targetFolder = src || ''
 let releaseFolder = dest || '.dist'
 let releasingFromRoot = targetFolder === ''
@@ -123,6 +134,17 @@ async function runRelease() {
   }
 
   nocleanup !== true && await fs.remove(distFolder)
+
+  if (commit || push) {
+    console.log(chalk.gray(`commiting changes...`))
+    await cmdAsync('git add .')
+    await cmdAsync(`git commit -m 'released v${newVersion}'`).catch(logError)
+  }
+
+  if (push) {
+    console.log(chalk.gray(`pushing to GitHub..`))
+    await cmdAsync('git push').catch(logError)
+  }
 
   if (hasErrors()) {
     console.log(chalk.yellow(`\n${errors.length} errors...`))
