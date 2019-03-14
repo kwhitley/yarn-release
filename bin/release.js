@@ -136,6 +136,7 @@ async function runRelease() {
   nocleanup !== true && await fs.remove(distFolder)
 
   if (commit || push) {
+    process.chdir(rootFolder)
     console.log(chalk.gray(`commiting changes...`))
     await cmdAsync('git add .')
     await cmdAsync(`git commit -m 'released v${newVersion}'`).catch(logError)
