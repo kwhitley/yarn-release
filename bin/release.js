@@ -8,6 +8,7 @@ const Promise = require('bluebird')
 const path = require('path')
 const rootPath = require('app-root-path').toString()
 const pkg = require(`${rootPath}/package.json`)
+const inquirer = require('inquirer')
 
 const cmdAsync = Promise.promisify(cmd.get, { multiArgs: true, context: cmd })
 const distPkg = JSON.parse(JSON.stringify(pkg))
@@ -38,17 +39,18 @@ const versionBump = (v) => (type = 'patch') => {
 
 release
   .version(pkg.version)
-  .option('-M, --major', 'major release X.#.# for breaking changes')
-  .option('-m, --minor', 'minor release #.X.# non-breaking for feature additions')
-  .option('-p, --patch', 'patch release #.#.X for patch fixes/tweaks')
-  .option('-s, --src <dir>', 'directory to build/release from (default=root)')
-  .option('-d, --dest <dir>', 'temporary build directory (default=.dist)')
-  .option('-t, --test', 'build, but do not publish')
-  .option('-c, --nocleanup', 'leave build folder after publishing')
-  .option('-v, --verbose', 'writes a bunch of extra stuff to the console')
+  .option('--major', 'major release X.#.# for breaking changes')
+  .option('--minor', 'minor release #.X.# non-breaking for feature additions')
+  .option('--patch', 'patch release #.#.X for patch fixes/tweaks')
+  .option('--src <dir>', 'directory to build/release from (default=root)')
+  .option('--dest <dir>', 'temporary build directory (default=.dist)')
+  .option('--test', 'build, but do not publish')
+  .option('--nocleanup', 'leave build folder after publishing')
   .option('--public', 'equivalent to npm publish --access=public')
   .option('--commit', 'adds unstaged changes (including package.json update) to git and commits')
   .option('--push', 'includes --commit, while also doing a "git push" (assumes ref has been set up)')
+  .option('-v, --verbose', 'writes a bunch of extra stuff to the console')
+  .option('-s, --silent', 'asks no questions')
   .parse(process.argv)
 
 let releaseType =
@@ -66,6 +68,7 @@ let {
   public,
   commit,
   push,
+  silent,
 } = release
 let targetFolder = src || ''
 let releaseFolder = dest || '.dist'
@@ -140,15 +143,29 @@ async function runRelease() {
                                             .catch(logError)
 
   if (commit || push) {
+    let commitMessage = `released v${newVersion}`
     process.chdir(rootFolder)
     console.log(chalk.gray(`commiting changes...`))
     await cmdAsync('git add .')
-    await cmdAsync(`git commit -m 'released v${newVersion}'`).catch(logError)
+
+    if (!silent) {
+      let { message } = await inquirer.prompt([
+        {
+          name: 'message',
+          message: 'Enter a commit message (optional)',
+        }
+      ])
+      if (message) {
+        commitMessage += ` - ${message}`
+      }
+    }
+    test && console.log(chalk.gray(`git commit -m '${commitMessage}'`))
+    !test && await cmdAsync(`git commit -m '${commitMessage}'`).catch(logError)
   }
 
   if (push) {
     console.log(chalk.gray(`pushing to GitHub..`))
-    await cmdAsync('git push').catch(logError)
+    !test && await cmdAsync('git push').catch(logError)
   }
 
   if (hasErrors()) {

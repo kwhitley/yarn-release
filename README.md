@@ -21,19 +21,20 @@ yarn add -D @kwhitley/yarn-release
 
 ### Options
 ```bash
--V, --version     output the version number
--M, --major       major release X.#.# for breaking changes
--m, --minor       minor release #.X.# non-breaking for feature additions
--p, --patch       patch release #.#.X for patch fixes/tweaks
--s, --src <dir>   directory to build/release from (default=root)
--d, --dest <dir>  temporary build directory (default=./.dist)
--t, --test        build, but do not publish (great for testing locally)
--c, --nocleanup   leave build folder after publishing (great for testing locally)
--v, --verbose     writes a bunch of extra stuff to the console
--h, --help        output usage information
+--major           major release X.#.# for breaking changes
+--minor           minor release #.X.# non-breaking for feature additions
+--patch           patch release #.#.X for patch fixes/tweaks
+--src <dir>       directory to build/release from (default=root)
+--dest <dir>      temporary build directory (default=./.dist)
+--test            build, but do not publish (great for testing locally)
+--nocleanup       leave build folder after publishing (great for testing locally)
 --public          equivalent to npm publish --access=public
 --commit          adds unstaged changes (including package.json update) to git and commits
 --push            includes --commit, while also doing a "git push" (assumes ref has been set up)
+-s, --silent      asks no questions (automated)
+-v, --verbose     writes a bunch of extra stuff to the console
+-V, --version     output the version number
+-h, --help        output usage information
 ```
 
 ### Example Usage (package.json)
