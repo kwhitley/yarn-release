@@ -123,20 +123,19 @@ async function runRelease() {
     process.chdir(releaseFolder)
   }
 
-  if (test) {
-    console.log(chalk.white(`publishing ${name} --> v${newVersion}`))
-    console.log(chalk.yellow(`test complete... skipping publish`))
-  } else {
-    console.log(chalk.gray(`updating version in ${releasingFromRoot ? rootFolder : releaseFolder}/package.json`))
-    await fs.writeJson(`${releasingFromRoot ? rootFolder : distFolder}/package.json`, pkg, { spaces: 2 })
-            .catch(console.log)
+  console.log(chalk.gray(`updating version in ${releasingFromRoot ? rootFolder : releaseFolder}/package.json`))
+  await fs.writeJson(`${releasingFromRoot ? rootFolder : distFolder}/package.json`, pkg, { spaces: 2 })
+          .catch(console.log)
 
-    console.log(chalk.white(`publishing ${name} --> v${newVersion}`))
+  console.log(chalk.white(`publishing ${name} --> v${newVersion}`))
+  if (!test) {
     let output = await cmdAsync(`yarn publish --new-version ${newVersion}` + (public ? ' --access=public' : '')).catch(logError)
     verbose && explain(output)
+  } else {
+    console.log(chalk.yellow('skipping publish.'))
   }
 
-  nocleanup !== true && await fs.remove(distFolder)
+  !nocleanup && await fs.remove(distFolder)
 
   !test && !releasingFromRoot && await fs.writeJson(`${rootFolder}/package.json`, pkg, { spaces: 2 })
                                             .then(console.log(chalk.gray('updated root package.json')))
