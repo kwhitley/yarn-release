@@ -21,13 +21,15 @@ yarn add -D @kwhitley/yarn-release
 
 ### Options
 ```bash
---major           major release X.#.# for breaking changes
+--type            version type <major|minor|patch|alpha|beta|rc|etc>
+--major           major release X.#.# for breaking changes, short for --type=major
 --minor           minor release #.X.# non-breaking for feature additions
 --patch           patch release #.#.X for patch fixes/tweaks
 --src <dir>       directory to build/release from (default=root)
 --dest <dir>      temporary build directory (default=./.dist)
 --test            build, but do not publish (great for testing locally)
 --nocleanup       leave build folder after publishing (great for testing locally)
+--nopublish       do not publish new version to NPM
 --public          equivalent to npm publish --access=public
 --commit          adds unstaged changes (including package.json update) to git and commits
 --push            includes --commit, while also doing a "git push" (assumes ref has been set up)
@@ -45,6 +47,7 @@ yarn add -D @kwhitley/yarn-release
     "release:major": "yarn build && release --major --src=build",
     "release:minor": "yarn build && release --minor --src=build",
     "release:patch": "yarn build && release --patch --src=build",
+    "release:rc": "yarn build && release --rc --nopublish"
   }
 }
 ```

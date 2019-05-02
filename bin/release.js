@@ -24,24 +24,35 @@ const explain = (...args) => {
 }
 
 const versionBump = (v) => (type = 'patch') => {
-  let order = ['major', 'minor', 'patch']
-  let parts = v.split('.')
-  let base = Array(3).fill(0).map((v, i) => Number(parts[i] || v))
-  let target = order.indexOf(type)
+  let order = ['major', 'minor', 'patch', 'partial-type', 'partial-version']
+  let isPartial = !order.includes(type)
+  let parts = v.split(/\.|-/)
+  let partialType = parts[3]
+  let base = Array(5).fill(0).map((v, i) => Number(parts[i] || v))
+  let target = order.indexOf(isPartial ? 'partial-version' : type)
+  let partialIndex = order.indexOf('partial-version')
   let updated = base.map((v, i) => {
     if (i < target) return v
+    if (isPartial && type !== partialType && i === partialIndex) return 0
     if (i === target) return ++v
     return 0
   })
 
-  return updated.join('.')
+  if (isPartial) {
+    updated[order.indexOf('partial-type')] = `-${type}`
+  } else {
+    updated = updated.slice(0, 3)
+  }
+
+  return updated.join('.').replace(/\.-/gi, '-')
 }
 
 release
   .version(pkg.version)
-  .option('--major', 'major release X.#.# for breaking changes')
-  .option('--minor', 'minor release #.X.# non-breaking for feature additions')
-  .option('--patch', 'patch release #.#.X for patch fixes/tweaks')
+  .option('--type <major|minor|patch|alpha|beta|rc|etc>', 'define the type of the release, e.g. --type=alpha')
+  .option('--major', 'major release X.#.# for breaking changes, shorthand for --type=major')
+  .option('--minor', 'minor release #.X.# non-breaking for feature additions, shorthand for --type=minor')
+  .option('--patch', 'patch release #.#.X for patch fixes/tweaks, shorthand for --type=patch')
   .option('--src <dir>', 'directory to build/release from (default=root)')
   .option('--dest <dir>', 'temporary build directory (default=.dist)')
   .option('--test', 'build, but do not publish')
@@ -49,6 +60,7 @@ release
   .option('--public', 'equivalent to npm publish --access=public')
   .option('--commit', 'adds unstaged changes (including package.json update) to git and commits')
   .option('--push', 'includes --commit, while also doing a "git push" (assumes ref has been set up)')
+  .option('--nopublish', 'do not publish new version to NPM')
   .option('-v, --verbose', 'writes a bunch of extra stuff to the console')
   .option('-s, --silent', 'asks no questions')
   .parse(process.argv)
@@ -57,8 +69,10 @@ let releaseType =
   (release.major && 'major') ||
   (release.minor && 'minor') ||
   (release.patch && 'patch') ||
+  (release.type) ||
   undefined
 
+console.log('release', release)
 let {
   src,
   dest,
@@ -69,6 +83,8 @@ let {
   commit,
   push,
   silent,
+  nopublish,
+  type,
 } = release
 let targetFolder = src || ''
 let releaseFolder = dest || '.dist'
@@ -82,8 +98,11 @@ const sourceFolder = path.join(rootPath, targetFolder)
 const distFolder = path.join(rootPath, releaseFolder)
 
 if (verbose) {
+  explain('releaseType', releaseType)
+  explain('type', type)
   explain('root', rootFolder)
-  explain('src', sourceFolder)
+  explain('src', src)
+  explain('sourceFolder', sourceFolder)
   explain('dest', distFolder)
 }
 
@@ -128,7 +147,7 @@ async function runRelease() {
           .catch(console.log)
 
   console.log(chalk.white(`publishing ${name} --> v${newVersion}`))
-  if (!test) {
+  if (!test && !nopublish) {
     let output = await cmdAsync(`yarn publish --new-version ${newVersion}` + (public ? ' --access=public' : '')).catch(logError)
     verbose && explain(output)
   } else {

@@ -1,6 +1,6 @@
 {
   "name": "@kwhitley/yarn-release",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Simplifies module releases to NPM via Yarn",
   "keywords": [
     "publish",
@@ -16,6 +16,7 @@
     "verify": "node bin/release.js --patch --src=bin --nocleanup --test --verbose",
     "verify:git": "node bin/release.js --patch --src=bin --nocleanup --test --push --verbose",
     "verify:root": "node bin/release.js --patch --nocleanup --test --verbose",
+    "verify:partial": "node bin/release.js --src=bin --type=pr130 --nocleanup --nopublish --verbose",
     "release:major": "node bin/release.js --major --push",
     "release:minor": "node bin/release.js --minor --push",
     "release:patch": "node bin/release.js --patch --push"
@@ -43,5 +44,9 @@
     "node-cmd": "^3.0.0",
     "np": "^4.0.2",
     "prompt": "^1.0.0"
+  },
+  "devDependencies": {
+    "@arundo/app-starter": "^0.3.4-pr.0",
+    "@kwhitley/use-store": "^1.2.6"
   }
 }
