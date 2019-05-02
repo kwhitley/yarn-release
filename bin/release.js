@@ -72,7 +72,6 @@ let releaseType =
   (release.type) ||
   undefined
 
-console.log('release', release)
 let {
   src,
   dest,
