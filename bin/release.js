@@ -90,7 +90,11 @@ let releaseFolder = dest || '.dist'
 let releasingFromRoot = targetFolder === ''
 
 // return --help if no release style specified
-if (!releaseType) return release.outputHelp()
+if (!releaseType) {
+  console.log(chalk.magentaBright('No release type found. Please specify a release type by using one of the following flags:'))
+  console.log(chalk.magenta('--major\n--minor\n--patch\n--type=major|minor|patch|alpha|rc|etc\n'))
+  return release.outputHelp()
+}
 
 const rootFolder = path.join(rootPath)
 const sourceFolder = path.join(rootPath, targetFolder)
