@@ -1,6 +1,6 @@
 {
   "name": "@kwhitley/yarn-release",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "Simplifies module releases to NPM via Yarn",
   "keywords": [
     "publish",
@@ -23,7 +23,7 @@
     "release:minor": "yarn release - --minor",
     "release:patch": "yarn release - --patch",
     "release:foo": "yarn release",
-    "release:test": "node bin/release.js --push --test --verbose"
+    "release:test": "node bin/release.js --test --nopublish --verbose --type=patch"
   },
   "bin": {
     "release": "./bin/release.js"

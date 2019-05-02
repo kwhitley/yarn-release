@@ -146,14 +146,18 @@ async function runRelease() {
   }
 
   console.log(chalk.gray(`updating version in ${releasingFromRoot ? rootFolder : releaseFolder}/package.json`))
-  await fs.writeJson(`${releasingFromRoot ? rootFolder : distFolder}/package.json`, pkg, { spaces: 2 })
-          .catch(console.log)
+  !test && await fs.writeJson(`${releasingFromRoot ? rootFolder : distFolder}/package.json`, pkg, { spaces: 2 })
+                  .catch(console.log)
 
   console.log(chalk.white(`publishing ${name} --> v${newVersion}`))
+  let optionalTagName = ['major', 'minor', 'patch'].includes(releaseType) ? '' : `--tag ${releaseType}`
+  let publishCommand = `yarn publish --new-version ${newVersion} ${optionalTagName}` + (public ? ' --access=public' : '')
+
   if (!test && !nopublish) {
-    let output = await cmdAsync(`yarn publish --new-version ${newVersion}` + (public ? ' --access=public' : '')).catch(logError)
+    let output = await cmdAsync(publishCommand).catch(logError)
     verbose && explain(output)
   } else {
+    verbose && explain('publish command', publishCommand)
     console.log(chalk.yellow('skipping publish.'))
   }
 
