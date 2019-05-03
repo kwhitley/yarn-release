@@ -17,7 +17,7 @@ yarn add -D @kwhitley/yarn-release
 ```
 
 # Exposed Commands
-- Just one: `yarn release --major|minor|patch [options]`
+- Just one: `yarn release --major|minor|patch|type=[something] [options]`
 
 ### Options
 ```bash
@@ -44,10 +44,13 @@ yarn add -D @kwhitley/yarn-release
 {
   "scripts": {
     "build": "do some stuff",
-    "release:major": "yarn build && release --major --src=build",
-    "release:minor": "yarn build && release --minor --src=build",
-    "release:patch": "yarn build && release --patch --src=build",
-    "release:rc": "yarn build && release --rc --nopublish"
+    "prerelease": "test some stuff",
+    "release": "yarn build && release --src=build --push",
+    "release:major": "yarn release - --major",
+    "release:minor": "yarn release - --minor",
+    "release:patch": "yarn release - --patch",
+    "release:rc": "yarn release - --type=rc",
+    "release:verify": "yarn release - --type=rc --verbose --test --nopublish --nocleanup"
   }
 }
 ```
