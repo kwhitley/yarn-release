@@ -1,6 +1,6 @@
 {
   "name": "@kwhitley/yarn-release",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "description": "Simplifies module releases to NPM via Yarn",
   "keywords": [
     "publish",
@@ -39,7 +39,6 @@
   },
   "homepage": "https://github.com/kwhitley/yarn-release#readme",
   "dependencies": {
-    "app-root-path": "^2.1.0",
     "bluebird": "^3.5.3",
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
@@ -48,9 +47,5 @@
     "node-cmd": "^3.0.0",
     "np": "^4.0.2",
     "prompt": "^1.0.0"
-  },
-  "devDependencies": {
-    "@arundo/app-starter": "^0.3.4-pr.0",
-    "@kwhitley/use-store": "^1.2.6"
   }
 }
