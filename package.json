@@ -39,6 +39,7 @@
   },
   "homepage": "https://github.com/kwhitley/yarn-release#readme",
   "dependencies": {
+    "app-root-path": "^2.2.1",
     "bluebird": "^3.5.3",
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
