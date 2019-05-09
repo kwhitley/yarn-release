@@ -6,7 +6,7 @@ const chalk = require('chalk')
 const fs = require('fs-extra')
 const Promise = require('bluebird')
 const path = require('path')
-const rootPath = require('app-root-path').toString()
+const rootPath = path.resolve()
 const pkg = require(`${rootPath}/package.json`)
 const inquirer = require('inquirer')
 
