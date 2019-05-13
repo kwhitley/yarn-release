@@ -1,14 +1,16 @@
 {
-  "name": "@kwhitley/yarn-release",
-  "version": "1.9.1",
+  "name": "yarn-release",
+  "version": "1.9.2",
   "description": "Simplifies module releases to NPM via Yarn",
   "keywords": [
     "publish",
     "yarn",
     "npm",
-    "libraries",
-    "modules",
-    "easy"
+    "release",
+    "library",
+    "module",
+    "github",
+    "commit"
   ],
   "main": "bin/release.js",
   "scripts": {
