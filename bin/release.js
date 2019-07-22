@@ -200,7 +200,7 @@ async function runRelease() {
 
   if (tag) {
     console.log(chalk.gray(`pushing tagged release to GitHub..`))
-    let command = `git tag -a v${newVersion} -m "${commitMessage}"`
+    let command = `git tag -a ${newVersion} -m "${commitMessage}"`
     !test && await cmdAsync(command).catch(logError)
     !test && await cmdAsync('git push --tags').catch(logError)
   }
