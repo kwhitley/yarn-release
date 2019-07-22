@@ -27,6 +27,7 @@ yarn add -D yarn-release
 --patch           patch release #.#.X for patch fixes/tweaks
 --src <dir>       directory to build/release from (default=root)
 --dest <dir>      temporary build directory (default=./.dist)
+--tag             tag and push release to git
 --test            build, but do not publish (great for testing locally)
 --nocleanup       leave build folder after publishing (great for testing locally)
 --nopublish       do not publish new version to NPM

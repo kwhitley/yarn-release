@@ -59,6 +59,7 @@ release
   .option('--nocleanup', 'leave build folder after publishing')
   .option('--public', 'equivalent to npm publish --access=public')
   .option('--commit', 'adds unstaged changes (including package.json update) to git and commits')
+  .option('--tag', 'tag the release to git')
   .option('--push', 'includes --commit, while also doing a "git push" (assumes ref has been set up)')
   .option('--nopublish', 'do not publish new version to NPM')
   .option('-v, --verbose', 'writes a bunch of extra stuff to the console')
@@ -81,6 +82,7 @@ let {
   public,
   commit,
   push,
+  tag,
   silent,
   nopublish,
   type,
@@ -167,8 +169,9 @@ async function runRelease() {
                                             .then(console.log(chalk.gray('updated root package.json')))
                                             .catch(logError)
 
+  let commitMessage = `released v${newVersion}`
+
   if (commit || push) {
-    let commitMessage = `released v${newVersion}`
     process.chdir(rootFolder)
     console.log(chalk.gray(`commiting changes...`))
     await cmdAsync('git add .')
@@ -180,10 +183,12 @@ async function runRelease() {
           message: 'Enter a commit message (optional)',
         }
       ])
+
       if (message) {
         commitMessage += ` - ${message}`
       }
     }
+
     test && console.log(chalk.gray(`git commit -m '${commitMessage}'`))
     !test && await cmdAsync(`git commit -m '${commitMessage}'`).catch(logError)
   }
@@ -191,6 +196,13 @@ async function runRelease() {
   if (push) {
     console.log(chalk.gray(`pushing to GitHub..`))
     !test && await cmdAsync('git push').catch(logError)
+  }
+
+  if (tag) {
+    console.log(chalk.gray(`pushing tagged release to GitHub..`))
+    let command = `git tag -a v${newVersion} -m "${commitMessage}"`
+    !test && await cmdAsync(command).catch(logError)
+    !test && await cmdAsync('git push --tags').catch(logError)
   }
 
   if (hasErrors()) {

@@ -1,6 +1,6 @@
 {
   "name": "yarn-release",
-  "version": "1.9.2",
+  "version": "1.10.0",
   "description": "Simplifies module releases to NPM via Yarn",
   "keywords": [
     "publish",
