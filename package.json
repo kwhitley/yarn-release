@@ -41,13 +41,11 @@
   },
   "homepage": "https://github.com/kwhitley/yarn-release#readme",
   "dependencies": {
-    "bluebird": "^3.5.3",
-    "chalk": "^2.4.2",
-    "commander": "^2.19.0",
-    "fs-extra": "^7.0.1",
-    "inquirer": "^6.2.2",
-    "node-cmd": "^3.0.0",
-    "np": "^4.0.2",
-    "prompt": "^1.0.0"
+    "bluebird": "^3.7.2",
+    "chalk": "^4.1.0",
+    "commander": "^7.1.0",
+    "fs-extra": "^9.1.0",
+    "inquirer": "^7.3.3",
+    "node-cmd": "^4.0.0"
   }
 }

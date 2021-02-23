@@ -67,10 +67,10 @@ release
   .parse(process.argv)
 
 let releaseType =
-  (release.major && 'major') ||
-  (release.minor && 'minor') ||
-  (release.patch && 'patch') ||
-  (release.type) ||
+  (release.opts().major && 'major') ||
+  (release.opts().minor && 'minor') ||
+  (release.opts().patch && 'patch') ||
+  (release.opts().type) ||
   undefined
 
 let {
@@ -86,7 +86,7 @@ let {
   silent,
   nopublish,
   type,
-} = release
+} = release.opts()
 let targetFolder = src || ''
 let releaseFolder = dest || '.dist'
 let releasingFromRoot = targetFolder === ''
