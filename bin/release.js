@@ -185,12 +185,16 @@ async function runRelease() {
       ])
 
       if (message) {
+        message = message
+                    .replace(/^['"]+|['"]+$/g, '')  // strip leading/trailing quotes
+                    .trim()                         // strip any surrounding whitespace
+                    .replace(/"/g, '\'')            // strip interior double quotes to prevent escaping
         commitMessage += ` - ${message}`
       }
     }
 
-    test && console.log(chalk.gray(`git commit -m '${commitMessage}'`))
-    !test && await cmdAsync(`git commit -m '${commitMessage}'`).catch(logError)
+    test && console.log(chalk.gray(`git commit -m "${commitMessage}"`))
+    !test && await cmdAsync(`git commit -m "${commitMessage}"`).catch(logError)
   }
 
   if (push) {

@@ -1,6 +1,6 @@
 {
   "name": "yarn-release",
-  "version": "1.10.3",
+  "version": "1.10.4",
   "description": "Simplifies module releases to NPM via Yarn",
   "keywords": [
     "publish",
@@ -20,7 +20,7 @@
     "verify:root": "node bin/release.js --patch --nocleanup --test --verbose",
     "verify:pr": "yarn foo && node bin/release.js --src=bin --nocleanup --nopublish --verbose --test",
     "foo": "echo foo",
-    "release": "node bin/release.js --push",
+    "release": "node bin/release.js --push --patch",
     "release:major": "yarn release - --major",
     "release:minor": "yarn release - --minor",
     "release:patch": "yarn release - --patch",
