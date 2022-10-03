@@ -117,7 +117,11 @@ async function runRelease() {
   let newVersion = versionBump(version)(releaseType)
   pkg.version = newVersion
 
-  console.log(chalk.white.bold(`\nreleasing ${name} to NPM via yarn...`))
+  if (!test && !nopublish) {
+    console.log(chalk.white.bold(`\nreleasing ${name} to NPM via yarn...`))
+  } else {
+    console.log(chalk.white.bold(`\nreleasing ${name} via yarn...`))
+  }
   console.log(chalk.gray(`updating ${chalk.white(releaseType)} version (from ${chalk.white(version)} to ${chalk.white(newVersion)}) ...`))
   // empty any previous distribution
 
